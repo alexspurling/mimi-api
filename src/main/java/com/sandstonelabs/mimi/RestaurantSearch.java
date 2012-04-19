@@ -9,7 +9,7 @@ public class RestaurantSearch {
 	public static final String BASE_URL = "http://www2.viamichelin.co.uk";
 	public static final String SEARCH_URL = "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
-		
+	
 	public List<Restaurant> searchRestaurants(float latitude, float longitude) {
 		
 		Map<String, String> params = new HashMap<String, String>();
@@ -44,8 +44,8 @@ public class RestaurantSearch {
 		params.put("charset", "UTF-8");
 		params.put("typeJs", "jsePoi");
 		params.put("poiType", "true");
-		params.put("productId", restaurant.getProductId());
-		params.put("id", restaurant.getId());
+		params.put("productId", String.valueOf(restaurant.productId));
+		params.put("id", String.valueOf(restaurant.id));
 		params.put("zoomLevel", "13");
 		params.put("treatment", "RestaurantSearch");
 		params.put("listCode", "GR");
