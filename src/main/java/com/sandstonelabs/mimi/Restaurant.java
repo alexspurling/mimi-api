@@ -66,72 +66,89 @@ public class Restaurant {
 		private String country;
 		private String website;
 		
-		public void id(int id) {
-			this.id = id;
+		public RestaurantBuilder id(int id) {
+			this.id = id; 
+			return this;
 		}
 
-		public void productId(int productId) {
-			this.productId = productId;
+		public RestaurantBuilder productId(int productId) {
+			this.productId = productId; 
+			return this;
 		}
 
-		public void latitude(float latitude) {
-			this.latitude = latitude;
+		public RestaurantBuilder latitude(float latitude) {
+			this.latitude = latitude; 
+			return this;
 		}
 
-		public void longitude(float longitude) {
-			this.longitude = longitude;
+		public RestaurantBuilder longitude(float longitude) {
+			this.longitude = longitude; 
+			return this;
 		}
 
-		public void name(String name) {
-			this.name = name;
+		public RestaurantBuilder name(String name) {
+			this.name = name; 
+			return this;
 		}
 
-		public void description(String description) {
-			this.description = description;
+		public RestaurantBuilder description(String description) {
+			this.description = description; 
+			return this;
 		}
 
-		public void cuisine(String cuisine) {
-			this.cuisine = cuisine;
+		public RestaurantBuilder cuisine(String cuisine) {
+			this.cuisine = cuisine; 
+			return this;
 		}
 
-		public void foodPrice(String foodPrice) {
-			this.foodPrice = foodPrice;
+		public RestaurantBuilder foodPrice(String foodPrice) {
+			this.foodPrice = foodPrice; 
+			return this;
 		}
 
-		public void email(String email) {
-			this.email = email;
+		public RestaurantBuilder email(String email) {
+			this.email = email; 
+			return this;
 		}
 
-		public void phoneNumber(String phoneNumber) {
-			this.phoneNumber = phoneNumber;
+		public RestaurantBuilder phoneNumber(String phoneNumber) {
+			this.phoneNumber = phoneNumber; 
+			return this;
 		}
 
-		public void oneLineAddress(String oneLineAddress) {
-			this.oneLineAddress = oneLineAddress;
+		public RestaurantBuilder oneLineAddress(String oneLineAddress) {
+			this.oneLineAddress = oneLineAddress; 
+			return this;
 		}
 
-		public void address(String address) {
-			this.address = address;
+		public RestaurantBuilder address(String address) {
+			this.address = address; 
+			return this;
 		}
 
-		public void city(String city) {
-			this.city = city;
+		public RestaurantBuilder city(String city) {
+			this.city = city; 
+			return this;
 		}
 
-		public void zipCode(String zipCode) {
-			this.zipCode = zipCode;
+		public RestaurantBuilder zipCode(String zipCode) {
+			this.zipCode = zipCode; 
+			return this;
 		}
 
-		public void countryCode(String countryCode) {
-			this.countryCode = countryCode;
+		public RestaurantBuilder countryCode(String countryCode) {
+			this.countryCode = countryCode; 
+			return this;
 		}
 
-		public void country(String country) {
-			this.country = country;
+		public RestaurantBuilder country(String country) {
+			this.country = country; 
+			return this;
 		}
 
-		public void website(String website) {
-			this.website = website;
+		public RestaurantBuilder website(String website) {
+			this.website = website; 
+			return this;
 		}
 
 		public Restaurant build() {
