@@ -165,7 +165,18 @@ public class Restaurant {
 	public RestaurantDetails getRestaurantDetails() {
 		return restaurantDetails;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "Restaurant [id=" + id + ", productId=" + productId
+				+ ", latitude=" + latitude + ", longitude=" + longitude
+				+ ", name=" + name + ", description=" + description
+				+ ", cuisine=" + cuisine + ", foodPrice=" + foodPrice
+				+ ", email=" + email + ", phoneNumber=" + phoneNumber
+				+ ", oneLineAddress=" + oneLineAddress + ", address=" + address
+				+ ", city=" + city + ", zipCode=" + zipCode + ", countryCode="
+				+ countryCode + ", country=" + country + ", website=" + website
+				+ ", restaurantDetails=" + restaurantDetails + "]";
+	}
 
 }

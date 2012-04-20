@@ -14,7 +14,7 @@ public class RestaurantJsonConverterTest {
 	public void testLoadRestaurantFromJson() throws JsonParseException, IOException {
 		RestaurantJsonConverter jsonConverter = new RestaurantJsonConverter();
 		
-		jsonConverter.loadRestaurantFromJson(new File("/home/alex/dev/playspace/mimi/mimi-api/response-clean.txt"));
+		jsonConverter.loadRestaurantFromJson(new File("response-clean.txt"));
 	}
 
 }

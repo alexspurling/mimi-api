@@ -8,16 +8,16 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
 
+@SuppressWarnings("unchecked")
 public class RestaurantJsonConverter {
 
 	private final ObjectMapper mapper;
-
+	
 	public RestaurantJsonConverter() {
 		mapper = new ObjectMapper(); // can reuse, share globally
 		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -27,43 +27,41 @@ public class RestaurantJsonConverter {
 		return loadRestaurantFromJson(FileUtils.readFileToString(file));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<Restaurant> loadRestaurantFromJson(String jsonData) throws JsonParseException, IOException {
 		Map<String,Object> allData = mapper.readValue(jsonData, Map.class);
 		
 		//Contains a list of data for each search result
 		List<Map<String,Object>> resultsList = (List<Map<String,Object>>) allData.get("OB"); 
 		for (Map<String,Object> result : resultsList) {
-			parseRestaurantSearchResult(result);
+			Restaurant restaurant = parseRestaurantSearchResult(result);
+			System.out.println(restaurant);
 		}
-		//parseRestaurantSearchResult(result);
 		
 		return null;
 	}
 	
 	private Restaurant parseRestaurantSearchResult(Map<String, Object> result) {
 		
-		System.out.println("Result: " + result);
 		//Parse the expected fields
 		int id = getIntField(result, "id");
 		int productId = getIntField(result, "productId");
 		float latitude = getFloatField(getMapField(result, "coords"), "lat");
 		float longitude = getFloatField(getMapField(result, "coords"), "lon");
 		
-		String name;
-		String description;
-		String cuisine;
-		String foodPrice;
+		String name = getField(result, "name");
+		String description = getListItem(getListField(result, "vE"), 7);
+		String cuisine = getListItem(getListField(result, "vE"), 6);
+		String foodPrice = getListItem(getListField(result, "vE"), 4);
 		
-		String email;
-		String phoneNumber;
-		String oneLineAddress;
-		String address;
-		String city;
-		String zipCode;
-		String countryCode;
-		String country;
-		String website;
+		String email = getField(result, "Ik");
+		String phoneNumber = getField(result, "telephone");
+		String oneLineAddress = getField(result, "vX");
+		String address = getField(result, "address");
+		String city = getField(result, "city");
+		String zipCode = getField(result, "zipCode");
+		String countryCode = getField(result, "sO");
+		String country = getField(result, "countryLabel");
+		String website = getField(result, "aac");
 		
 		RestaurantBuilder builder = new Restaurant.RestaurantBuilder();
 		
@@ -88,22 +86,49 @@ public class RestaurantJsonConverter {
 		return builder.build();
 	}
 
-	private int getIntField(Map<String, Object> result, String key) {
+	private String getField(Map<String, Object> result, String key) {
 		try {
-			String value = (String) result.get(key);
-			return Integer.parseInt(value);
+			return (String) result.get(key);
 		}catch(ClassCastException e) {
-			return 0;
+			return null;
 		}
 	}
 
-	private float getFloatField(Map<String, Object> result, String key) {
-		try {
-			String value = (String) result.get(key);
-			return Float.parseFloat(value);
-		}catch(ClassCastException e) {
-			return 0;
+	private String getListItem(List<Object> listField, int i) {
+		if (i < listField.size()) {
+			return (String)listField.get(i);
 		}
+		return null;
+	}
+
+	private List<Object> getListField(Map<String, Object> result, String key) {
+		try {
+			return (List<Object>) result.get(key);
+		}catch(ClassCastException e) {
+			return Collections.emptyList();
+		}
+	}
+
+	private int getIntField(Map<String, Object> result, String key) {
+		Object value = result.get(key);
+		if (value instanceof Integer) {
+			return (Integer)value;
+		}else if (value instanceof String) {
+			return Integer.parseInt((String)value);
+		}
+		return 0;
+	}
+
+	private float getFloatField(Map<String, Object> result, String key) {
+		Object value = result.get(key);
+		if (value instanceof Double) {
+			return ((Double) value).floatValue();
+		}else if (value instanceof Float) {
+			return (Float)value;
+		}else if (value instanceof String) {
+			return Float.parseFloat((String)value);
+		}
+		return 0.0f;
 	}
 
 	private Map<String, Object> getMapField(Map<String, Object> result, String key) {
