@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,10 @@ public class CachedRestaurantSearch {
 		this.cacheFile = cacheFile;
 		this.jsonParser = jsonParser;
 		loadCache(cacheFile);
+	}
+	
+	public Set<Restaurant> getAllCachedRestaurants() {
+		return cachedRestaurants;
 	}
 
 	/**
@@ -77,11 +82,11 @@ public class CachedRestaurantSearch {
 	}
 
 	private void writeCache() throws IOException {
-		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(cacheFile)); 
+		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile)));
 		for (String restaurantJson : cachedRestaurantsJson) {
-			bufferedWriter.write(restaurantJson);
+			writer.println(restaurantJson);
 		}
-		IOUtils.closeQuietly(bufferedWriter);
+		IOUtils.closeQuietly(writer);
 	}
 
 }

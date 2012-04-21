@@ -103,9 +103,9 @@ public class RestaurantJsonParser {
 
 	private List<Object> getListField(Map<String, Object> result, String key) {
 		try {
-			return (List<Object>) result.get(key);
+			return result.get(key) != null ? (List<Object>)result.get(key) : Collections.<Object>emptyList();
 		}catch(ClassCastException e) {
-			recordError("List field not found: " + key);
+			recordError("Expected list field for key: " + key + ", but got: " + result.get(key));
 			return Collections.emptyList();
 		}
 	}
@@ -136,9 +136,9 @@ public class RestaurantJsonParser {
 
 	private Map<String, Object> getMapField(Map<String, Object> result, String key) {
 		try {
-			return (Map<String, Object>) result.get(key);
+			return result.get(key) != null ? (Map<String, Object>) result.get(key) : Collections.<String, Object>emptyMap();
 		}catch(ClassCastException e) {
-			recordError("Map field not found: " + key);
+			recordError("Expected map field for key: " + key + ", but got: " + result.get(key));
 			return Collections.emptyMap();
 		}
 	}

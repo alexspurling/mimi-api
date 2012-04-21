@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -25,6 +27,28 @@ public class CachedRestaurantSearchTest {
 		List<Restaurant> restaurants = cachedRestaurantSearch.getRestaurantsAtLocation(lat, lon, 300);
 		
 		assertTrue(restaurants.isEmpty());
+	}
+	
+	@Test
+	public void testWriteToEmptyCacheFile_newEntriesAreRecorded() throws IOException {
+		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
+		
+		File cacheFile = newEmptyCacheFile();
+		
+		CachedRestaurantSearch cachedRestaurantSearch1 = new CachedRestaurantSearch(cacheFile, jsonParser);
+		
+		Restaurant restaurant1 = new Restaurant.RestaurantBuilder().name("Restaurant 1").build();
+		Restaurant restaurant2 = new Restaurant.RestaurantBuilder().name("Restaurant 2").build();
+		List<Restaurant> storedRestaurants = Arrays.asList(restaurant1, restaurant2);
+		
+		cachedRestaurantSearch1.storeResultsInCache(storedRestaurants);
+		
+		CachedRestaurantSearch cachedRestaurantSearch2 = new CachedRestaurantSearch(cacheFile, jsonParser);
+		
+		Set<Restaurant> allCachedRestaurants = cachedRestaurantSearch2.getAllCachedRestaurants();
+		
+		//Make sure that our list of cached restaurants was actually returned
+		assertTrue(allCachedRestaurants.containsAll(storedRestaurants));
 	}
 	
 	@Test
@@ -59,3 +83,4 @@ public class CachedRestaurantSearchTest {
 	}
 
 }
+
