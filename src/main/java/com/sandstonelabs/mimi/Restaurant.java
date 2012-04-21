@@ -179,4 +179,113 @@ public class Restaurant {
 				+ ", restaurantDetails=" + restaurantDetails + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
+		result = prime * result + ((city == null) ? 0 : city.hashCode());
+		result = prime * result + ((country == null) ? 0 : country.hashCode());
+		result = prime * result + ((countryCode == null) ? 0 : countryCode.hashCode());
+		result = prime * result + ((cuisine == null) ? 0 : cuisine.hashCode());
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((foodPrice == null) ? 0 : foodPrice.hashCode());
+		result = prime * result + id;
+		result = prime * result + Float.floatToIntBits(latitude);
+		result = prime * result + Float.floatToIntBits(longitude);
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((oneLineAddress == null) ? 0 : oneLineAddress.hashCode());
+		result = prime * result + ((phoneNumber == null) ? 0 : phoneNumber.hashCode());
+		result = prime * result + productId;
+		result = prime * result + ((website == null) ? 0 : website.hashCode());
+		result = prime * result + ((zipCode == null) ? 0 : zipCode.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Restaurant other = (Restaurant) obj;
+		if (address == null) {
+			if (other.address != null)
+				return false;
+		} else if (!address.equals(other.address))
+			return false;
+		if (city == null) {
+			if (other.city != null)
+				return false;
+		} else if (!city.equals(other.city))
+			return false;
+		if (country == null) {
+			if (other.country != null)
+				return false;
+		} else if (!country.equals(other.country))
+			return false;
+		if (countryCode == null) {
+			if (other.countryCode != null)
+				return false;
+		} else if (!countryCode.equals(other.countryCode))
+			return false;
+		if (cuisine == null) {
+			if (other.cuisine != null)
+				return false;
+		} else if (!cuisine.equals(other.cuisine))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (foodPrice == null) {
+			if (other.foodPrice != null)
+				return false;
+		} else if (!foodPrice.equals(other.foodPrice))
+			return false;
+		if (id != other.id)
+			return false;
+		if (Float.floatToIntBits(latitude) != Float.floatToIntBits(other.latitude))
+			return false;
+		if (Float.floatToIntBits(longitude) != Float.floatToIntBits(other.longitude))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (oneLineAddress == null) {
+			if (other.oneLineAddress != null)
+				return false;
+		} else if (!oneLineAddress.equals(other.oneLineAddress))
+			return false;
+		if (phoneNumber == null) {
+			if (other.phoneNumber != null)
+				return false;
+		} else if (!phoneNumber.equals(other.phoneNumber))
+			return false;
+		if (productId != other.productId)
+			return false;
+		if (website == null) {
+			if (other.website != null)
+				return false;
+		} else if (!website.equals(other.website))
+			return false;
+		if (zipCode == null) {
+			if (other.zipCode != null)
+				return false;
+		} else if (!zipCode.equals(other.zipCode))
+			return false;
+		return true;
+	}
+
 }

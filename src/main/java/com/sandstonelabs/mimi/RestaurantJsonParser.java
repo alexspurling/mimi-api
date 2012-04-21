@@ -1,13 +1,10 @@
 package com.sandstonelabs.mimi;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
@@ -19,8 +16,6 @@ public class RestaurantJsonParser {
 
 	private final ObjectMapper mapper;
 	
-	//We use this to store the raw restaurant data for the purpose of caching
-	private List<String> resultsAsJson = new ArrayList<String>();
 	private List<String> errors = new ArrayList<String>();
 	
 	public RestaurantJsonParser() {
@@ -28,25 +23,8 @@ public class RestaurantJsonParser {
 		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 	}
 	
-	public List<Restaurant> parseRestaurantSearchResultsFromJson(File file) throws JsonParseException, IOException {
-		return parseRestaurantSearchResultsFromJson(FileUtils.readFileToString(file));
-	}
-	
-	public List<Restaurant> parseRestaurantSearchResultsFromJson(String jsonData) throws JsonParseException, IOException {
-		Map<String,Object> allData = mapper.readValue(jsonData, Map.class);
-		
-		List<Restaurant> restaurants = new ArrayList<Restaurant>();
-		
-		//Contains a list of data for each search result
-		List<Map<String,Object>> resultsList = (List<Map<String,Object>>)(List<?>) getListField(allData, "OB"); 
-		for (Map<String,Object> result : resultsList) {
-			//Cache the result for later
-			resultsAsJson.add(mapper.writeValueAsString(result));
-			Restaurant restaurant = parseRestaurantSearchResult(result);
-			restaurants.add(restaurant);
-		}
-		
-		return restaurants;
+	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws JsonParseException, IOException {
+		return parseRestaurantSearchResult(mapper.readValue(jsonData, Map.class));
 	}
 	
 	private Restaurant parseRestaurantSearchResult(Map<String, Object> result) {
@@ -103,8 +81,8 @@ public class RestaurantJsonParser {
 		return errors;
 	}
 	
-	public List<String> getResultsAsJson() {
-		return resultsAsJson;
+	public String convertRestaurantToJsonString(Restaurant restaurant) throws JsonParseException, IOException {
+		return mapper.writeValueAsString(restaurant);
 	}
 
 	private String getField(Map<String, Object> result, String key) {

@@ -1,7 +1,12 @@
 package com.sandstonelabs.mimi;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonParseException;
 
 public class ApiRestaurantSearch {
 
@@ -9,7 +14,13 @@ public class ApiRestaurantSearch {
 	public static final String SEARCH_URL = "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
 	
-	public String searchRestaurants(float latitude, float longitude) {
+	private final RestaurantJsonParser jsonParser;
+	
+	public ApiRestaurantSearch(RestaurantJsonParser jsonParser) {
+		this.jsonParser = jsonParser;
+	}
+	
+	public List<Restaurant> searchRestaurants(float latitude, float longitude) throws JsonParseException, IOException {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		
@@ -32,10 +43,27 @@ public class ApiRestaurantSearch {
 		params.put("from", "RESTAURANT_RESULT");
 		params.put("lang", "int");
 
+		//TODO 
+		// - make the API request
+		// - clean up the response
+		
+		/*
+		 * 	Map<String,Object> allData = mapper.readValue(jsonData, Map.class);
+		
+		List<Restaurant> restaurants = new ArrayList<Restaurant>();
+		
+		//Contains a list of data for each search result
+		List<Map<String,Object>> resultsList = (List<Map<String,Object>>)(List<?>) getListField(allData, "OB"); 
+		for (Map<String,Object> result : resultsList) {
+		
+		String jsonData = null;
+		return jsonParser.parseRestaurantSearchResultsFromJson(jsonData);
+		 */
+		
 		return null;
 	}
 	
-	public String getRestaurantDetails(Restaurant restaurant) {
+	public Restaurant getRestaurantDetails(Restaurant restaurant) {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("?lang", "gbr");
