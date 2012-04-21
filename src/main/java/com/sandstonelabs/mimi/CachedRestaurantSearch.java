@@ -3,6 +3,7 @@ package com.sandstonelabs.mimi;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +20,8 @@ public class CachedRestaurantSearch {
 	private final File cacheFile;
 	private final RestaurantJsonParser jsonParser;
 
-	private Set<Restaurant> cachedRestaurants;
-	private Set<String> cachedRestaurantsJson;
+	private Set<Restaurant> cachedRestaurants = new HashSet<Restaurant>();
+	private Set<String> cachedRestaurantsJson = new HashSet<String>();
 
 	public CachedRestaurantSearch(File cacheFile, RestaurantJsonParser jsonParser) throws JsonParseException, IOException {
 		this.cacheFile = cacheFile;
