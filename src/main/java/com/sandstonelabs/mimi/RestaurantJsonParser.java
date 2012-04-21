@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
@@ -23,7 +22,7 @@ public class RestaurantJsonParser {
 		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 	}
 	
-	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws JsonParseException, IOException {
+	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws IOException {
 		return parseRestaurantSearchResult(mapper.readValue(jsonData, Map.class));
 	}
 	
@@ -81,7 +80,7 @@ public class RestaurantJsonParser {
 		return errors;
 	}
 	
-	public String convertRestaurantToJsonString(Restaurant restaurant) throws JsonParseException, IOException {
+	public String convertRestaurantToJsonString(Restaurant restaurant) throws IOException {
 		return mapper.writeValueAsString(restaurant);
 	}
 

@@ -3,8 +3,6 @@ package com.sandstonelabs.mimi;
 import java.io.IOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonParseException;
-
 /**
  * Searches for and parses restaurant data 
  *
@@ -30,9 +28,8 @@ public class RestaurantService {
 	 * @param maxDistance
 	 * @return
 	 * @throws IOException 
-	 * @throws JsonParseException 
 	 */
-	public List<Restaurant> getRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws JsonParseException, IOException {
+	public List<Restaurant> getRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws IOException {
 		List<Restaurant> cachedRestaurants = cachedRestaurantSearch.getRestaurantsAtLocation(latitude, longitude, maxDistance);
 		if (!cachedRestaurants.isEmpty()) {
 			return cachedRestaurants;

@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParseException;
-
 public class ApiRestaurantSearch {
 
 	public static final String BASE_URL = "http://www2.viamichelin.co.uk";
@@ -20,7 +18,7 @@ public class ApiRestaurantSearch {
 		this.jsonParser = jsonParser;
 	}
 	
-	public List<Restaurant> searchRestaurants(float latitude, float longitude) throws JsonParseException, IOException {
+	public List<Restaurant> searchRestaurants(float latitude, float longitude) throws IOException {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		

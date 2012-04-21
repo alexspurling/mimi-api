@@ -1,6 +1,8 @@
 package com.sandstonelabs.mimi;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,9 +10,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
@@ -23,7 +25,7 @@ public class CachedRestaurantSearch {
 	private Set<Restaurant> cachedRestaurants = new HashSet<Restaurant>();
 	private Set<String> cachedRestaurantsJson = new HashSet<String>();
 
-	public CachedRestaurantSearch(File cacheFile, RestaurantJsonParser jsonParser) throws JsonParseException, IOException {
+	public CachedRestaurantSearch(File cacheFile, RestaurantJsonParser jsonParser) throws IOException {
 		this.cacheFile = cacheFile;
 		this.jsonParser = jsonParser;
 		loadCache(cacheFile);
@@ -52,7 +54,16 @@ public class CachedRestaurantSearch {
 		return nearbyRestaurants;
 	}
 
-	private void loadCache(File cacheFile) throws JsonParseException, IOException {
+	public void storeResultsInCache(List<Restaurant> restaurants) throws IOException {
+		for (Restaurant restaurant : restaurants) {
+			cachedRestaurants.add(restaurant);
+			cachedRestaurantsJson.add(jsonParser.convertRestaurantToJsonString(restaurant));
+		}
+		writeCache();
+	}
+
+	private void loadCache(File cacheFile) throws IOException {
+		cacheFile.createNewFile(); //Creates a new cache file if the given file does not exist
 		LineIterator it = FileUtils.lineIterator(cacheFile, "UTF-8");
 		try {
 			while (it.hasNext()) {
@@ -65,12 +76,12 @@ public class CachedRestaurantSearch {
 		}
 	}
 
-	public void storeResultsInCache(List<Restaurant> restaurants) throws JsonParseException, IOException {
-		for (Restaurant restaurant : restaurants) {
-			cachedRestaurants.add(restaurant);
-			cachedRestaurantsJson.add(jsonParser.convertRestaurantToJsonString(restaurant));
+	private void writeCache() throws IOException {
+		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(cacheFile)); 
+		for (String restaurantJson : cachedRestaurantsJson) {
+			bufferedWriter.write(restaurantJson);
 		}
-		// TODO Save the cache to a file
+		IOUtils.closeQuietly(bufferedWriter);
 	}
 
 }
