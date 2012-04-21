@@ -18,6 +18,9 @@ import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
 public class RestaurantJsonParser {
 
 	private final ObjectMapper mapper;
+	
+	//We use this to store the raw restaurant data for the purpose of caching
+	private List<String> resultsAsJson = new ArrayList<String>();
 	private List<String> errors = new ArrayList<String>();
 	
 	public RestaurantJsonParser() {
@@ -37,9 +40,10 @@ public class RestaurantJsonParser {
 		//Contains a list of data for each search result
 		List<Map<String,Object>> resultsList = (List<Map<String,Object>>)(List<?>) getListField(allData, "OB"); 
 		for (Map<String,Object> result : resultsList) {
+			//Cache the result for later
+			resultsAsJson.add(mapper.writeValueAsString(result));
 			Restaurant restaurant = parseRestaurantSearchResult(result);
 			restaurants.add(restaurant);
-			System.out.println(restaurant);
 		}
 		
 		return restaurants;
@@ -89,6 +93,18 @@ public class RestaurantJsonParser {
 		website(website);
 		
 		return builder.build();
+	}
+
+	private void recordError(String string) {
+		errors.add(string);
+	}
+	
+	public List<String> getErrors() {
+		return errors;
+	}
+	
+	public List<String> getResultsAsJson() {
+		return resultsAsJson;
 	}
 
 	private String getField(Map<String, Object> result, String key) {
@@ -148,13 +164,5 @@ public class RestaurantJsonParser {
 			recordError("Map field not found: " + key);
 			return Collections.emptyMap();
 		}
-	}
-
-	private void recordError(String string) {
-		errors.add(string);
-	}
-	
-	public List<String> getErrors() {
-		return errors;
 	}
 }

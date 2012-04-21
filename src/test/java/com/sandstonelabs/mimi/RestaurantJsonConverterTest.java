@@ -15,12 +15,12 @@ public class RestaurantJsonConverterTest {
 
 	@Test
 	public void testLoadRestaurantFromJson() throws JsonParseException, IOException {
-		RestaurantJsonParser jsonConverter = new RestaurantJsonParser();
+		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
-		List<Restaurant> restaurants = jsonConverter.parseRestaurantSearchResultsFromJson(new File("response-clean.txt"));
+		List<Restaurant> restaurants = jsonParser.parseRestaurantSearchResultsFromJson(new File("response-clean.txt"));
 		
 		assertFalse(restaurants.isEmpty());
-		assertTrue(jsonConverter.getErrors().isEmpty());
+		assertTrue(jsonParser.getErrors().isEmpty());
 	}
 
 }

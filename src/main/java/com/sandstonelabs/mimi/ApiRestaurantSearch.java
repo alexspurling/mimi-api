@@ -3,7 +3,7 @@ package com.sandstonelabs.mimi;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RestaurantSearch {
+public class ApiRestaurantSearch {
 
 	public static final String BASE_URL = "http://www2.viamichelin.co.uk";
 	public static final String SEARCH_URL = "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
