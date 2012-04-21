@@ -2,6 +2,7 @@ package com.sandstonelabs.mimi;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -14,30 +15,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
 
 @SuppressWarnings("unchecked")
-public class RestaurantJsonConverter {
+public class RestaurantJsonParser {
 
 	private final ObjectMapper mapper;
+	private List<String> errors = new ArrayList<String>();
 	
-	public RestaurantJsonConverter() {
+	public RestaurantJsonParser() {
 		mapper = new ObjectMapper(); // can reuse, share globally
 		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 	}
 	
-	public List<Restaurant> loadRestaurantFromJson(File file) throws JsonParseException, IOException {
-		return loadRestaurantFromJson(FileUtils.readFileToString(file));
+	public List<Restaurant> parseRestaurantSearchResultsFromJson(File file) throws JsonParseException, IOException {
+		return parseRestaurantSearchResultsFromJson(FileUtils.readFileToString(file));
 	}
 	
-	public List<Restaurant> loadRestaurantFromJson(String jsonData) throws JsonParseException, IOException {
+	public List<Restaurant> parseRestaurantSearchResultsFromJson(String jsonData) throws JsonParseException, IOException {
 		Map<String,Object> allData = mapper.readValue(jsonData, Map.class);
 		
+		List<Restaurant> restaurants = new ArrayList<Restaurant>();
+		
 		//Contains a list of data for each search result
-		List<Map<String,Object>> resultsList = (List<Map<String,Object>>) allData.get("OB"); 
+		List<Map<String,Object>> resultsList = (List<Map<String,Object>>)(List<?>) getListField(allData, "OB"); 
 		for (Map<String,Object> result : resultsList) {
 			Restaurant restaurant = parseRestaurantSearchResult(result);
+			restaurants.add(restaurant);
 			System.out.println(restaurant);
 		}
 		
-		return null;
+		return restaurants;
 	}
 	
 	private Restaurant parseRestaurantSearchResult(Map<String, Object> result) {
@@ -90,6 +95,7 @@ public class RestaurantJsonConverter {
 		try {
 			return (String) result.get(key);
 		}catch(ClassCastException e) {
+			recordError("Field not found: " + key);
 			return null;
 		}
 	}
@@ -98,6 +104,7 @@ public class RestaurantJsonConverter {
 		if (i < listField.size()) {
 			return (String)listField.get(i);
 		}
+		recordError("Index not found in list. Index: " + i + ", list size: " + listField.size());
 		return null;
 	}
 
@@ -105,6 +112,7 @@ public class RestaurantJsonConverter {
 		try {
 			return (List<Object>) result.get(key);
 		}catch(ClassCastException e) {
+			recordError("List field not found: " + key);
 			return Collections.emptyList();
 		}
 	}
@@ -116,6 +124,7 @@ public class RestaurantJsonConverter {
 		}else if (value instanceof String) {
 			return Integer.parseInt((String)value);
 		}
+		recordError("Int field not found: " + key);
 		return 0;
 	}
 
@@ -128,6 +137,7 @@ public class RestaurantJsonConverter {
 		}else if (value instanceof String) {
 			return Float.parseFloat((String)value);
 		}
+		recordError("Float field not found: " + key);
 		return 0.0f;
 	}
 
@@ -135,7 +145,16 @@ public class RestaurantJsonConverter {
 		try {
 			return (Map<String, Object>) result.get(key);
 		}catch(ClassCastException e) {
+			recordError("Map field not found: " + key);
 			return Collections.emptyMap();
 		}
+	}
+
+	private void recordError(String string) {
+		errors.add(string);
+	}
+	
+	public List<String> getErrors() {
+		return errors;
 	}
 }

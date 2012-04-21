@@ -1,7 +1,10 @@
 package com.sandstonelabs.mimi;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -12,9 +15,12 @@ public class RestaurantJsonConverterTest {
 
 	@Test
 	public void testLoadRestaurantFromJson() throws JsonParseException, IOException {
-		RestaurantJsonConverter jsonConverter = new RestaurantJsonConverter();
+		RestaurantJsonParser jsonConverter = new RestaurantJsonParser();
 		
-		jsonConverter.loadRestaurantFromJson(new File("response-clean.txt"));
+		List<Restaurant> restaurants = jsonConverter.parseRestaurantSearchResultsFromJson(new File("response-clean.txt"));
+		
+		assertFalse(restaurants.isEmpty());
+		assertTrue(jsonConverter.getErrors().isEmpty());
 	}
 
 }

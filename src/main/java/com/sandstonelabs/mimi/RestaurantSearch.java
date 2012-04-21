@@ -1,7 +1,6 @@
 package com.sandstonelabs.mimi;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RestaurantSearch {
@@ -10,7 +9,7 @@ public class RestaurantSearch {
 	public static final String SEARCH_URL = "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
 	
-	public List<Restaurant> searchRestaurants(float latitude, float longitude) {
+	public String searchRestaurants(float latitude, float longitude) {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		
@@ -36,7 +35,7 @@ public class RestaurantSearch {
 		return null;
 	}
 	
-	public Restaurant getRestaurantDetails(Restaurant restaurant) {
+	public String getRestaurantDetails(Restaurant restaurant) {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("?lang", "gbr");
