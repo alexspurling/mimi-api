@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
+import com.sandstonelabs.mimi.RestaurantRating.RatingType;
 
 public class RestaurantJsonParser {
 	
@@ -30,6 +31,8 @@ public class RestaurantJsonParser {
 		String cuisine = getListItem(getListField(result, "vE"), 6);
 		String foodPrice = getListItem(getListField(result, "vE"), 4);
 		
+		RestaurantRating restaurantRating = getRestaurantRating(getListField(result, "CY"));
+		
 		String email = getField(result, "Ik");
 		String phoneNumber = getField(result, "telephone");
 		String oneLineAddress = getField(result, "vX");
@@ -49,7 +52,8 @@ public class RestaurantJsonParser {
 		name(name).
 		description(description).
 		cuisine(cuisine).
-		foodPrice(foodPrice).		
+		foodPrice(foodPrice).
+		rating(restaurantRating).
 		email(email).
 		phoneNumber(phoneNumber).
 		oneLineAddress(oneLineAddress).
@@ -61,6 +65,39 @@ public class RestaurantJsonParser {
 		website(website);
 		
 		return builder.build();
+	}
+
+	private RestaurantRating getRestaurantRating(JSONArray listField) throws JSONException {
+		String ratingImage = getListItem(listField, 2);
+		String ratingImageFile = ratingImage.replaceFirst(".*/(.*)", "$1");
+		
+		if ("1_12.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(1, RatingType.COMFORTABLE);
+		}else if ("1_13.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(2, RatingType.COMFORTABLE);
+		}else if ("1_14.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(3, RatingType.COMFORTABLE);
+		}else if ("1_15.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(4, RatingType.COMFORTABLE);
+		}else if ("1_16.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(5, RatingType.COMFORTABLE);
+		}else if ("1_17.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(1, RatingType.PLEASANT);
+		}else if ("1_18.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(2, RatingType.PLEASANT);
+		}else if ("1_19.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(3, RatingType.PLEASANT);
+		}else if ("1_20.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(4, RatingType.PLEASANT);
+		}else if ("1_21.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(5, RatingType.PLEASANT);
+		}else if ("1_282.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(1, RatingType.PUB);
+		}else if ("1_504.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(1, RatingType.HOTEL);
+		}
+		
+		return null;
 	}
 
 	private void recordError(String string) {

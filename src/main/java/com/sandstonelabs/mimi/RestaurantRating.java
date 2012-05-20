@@ -2,6 +2,16 @@ package com.sandstonelabs.mimi;
 
 public class RestaurantRating {
 
+	public static enum RatingType {
+
+		COMFORTABLE,
+		PLEASANT,
+		MICHELIN_STAR,
+		PUB,
+		HOTEL
+		
+	}
+	
 	public final int ratingValue;
 	public final RatingType ratingType;
 	

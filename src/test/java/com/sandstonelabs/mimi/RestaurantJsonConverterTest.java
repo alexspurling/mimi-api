@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.json.JSONException;
 import org.junit.Test;
 
+import com.sandstonelabs.mimi.RestaurantRating.RatingType;
+
 public class RestaurantJsonConverterTest {
 
 	@Test
@@ -23,6 +25,7 @@ public class RestaurantJsonConverterTest {
 			description("Friendly, conscientiously run Chelsea local, where satisfying and carefully prepared pub classics are served in the roomy, civilised bar or in the warm, comfortable dining room at the back.").
 			cuisine("modern").
 			foodPrice("Carte: 21£/34£").
+			rating(new RestaurantRating(1, RatingType.PUB)).
 			email("thephoenix@geronimo-inns.co.uk").
 			phoneNumber("(020) 77309182").
 			oneLineAddress("23 Smith St GB - Chelsea SW3 4EE").
