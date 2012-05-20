@@ -1,6 +1,5 @@
 package com.sandstonelabs.mimi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class RestaurantJsonParser {
 	
 	private List<String> errors = new ArrayList<String>();
 	
-	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws IOException, JSONException {
+	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws JSONException {
 		return parseRestaurantSearchResult(new JSONObject(jsonData));
 	}
 	
