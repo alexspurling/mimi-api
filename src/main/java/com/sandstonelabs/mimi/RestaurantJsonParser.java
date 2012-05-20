@@ -2,31 +2,23 @@ package com.sandstonelabs.mimi;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.sandstonelabs.mimi.Restaurant.RestaurantBuilder;
 
-@SuppressWarnings("unchecked")
 public class RestaurantJsonParser {
-
-	private final ObjectMapper mapper;
 	
 	private List<String> errors = new ArrayList<String>();
 	
-	public RestaurantJsonParser() {
-		mapper = new ObjectMapper(); // can reuse, share globally
-		mapper.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws IOException, JSONException {
+		return parseRestaurantSearchResult(new JSONObject(jsonData));
 	}
 	
-	public Restaurant parseRestaurantSearchResultsFromJson(String jsonData) throws IOException {
-		return parseRestaurantSearchResult(mapper.readValue(jsonData, Map.class));
-	}
-	
-	private Restaurant parseRestaurantSearchResult(Map<String, Object> result) {
+	private Restaurant parseRestaurantSearchResult(JSONObject result) throws JSONException {
 		
 		//Parse the expected fields
 		int id = getIntField(result, "id");
@@ -79,12 +71,8 @@ public class RestaurantJsonParser {
 	public List<String> getErrors() {
 		return errors;
 	}
-	
-	public String convertRestaurantToJsonString(Restaurant restaurant) throws IOException {
-		return mapper.writeValueAsString(restaurant);
-	}
 
-	private String getField(Map<String, Object> result, String key) {
+	private String getField(JSONObject result, String key) throws JSONException {
 		try {
 			return (String) result.get(key);
 		}catch(ClassCastException e) {
@@ -93,27 +81,31 @@ public class RestaurantJsonParser {
 		}
 	}
 
-	private String getListItem(List<Object> listField, int i) {
-		if (i < listField.size()) {
+	private String getListItem(JSONArray listField, int i) throws JSONException {
+		if (i < listField.length()) {
 			return (String)listField.get(i);
 		}
-		recordError("Index not found in list. Index: " + i + ", list size: " + listField.size());
+		recordError("Index not found in list. Index: " + i + ", list size: " + listField.length());
 		return null;
 	}
 
-	private List<Object> getListField(Map<String, Object> result, String key) {
+	private JSONArray getListField(JSONObject result, String key) throws JSONException {
 		try {
-			return result.get(key) != null ? (List<Object>)result.get(key) : Collections.<Object>emptyList();
+			if (result.get(key) != null) {
+				return (JSONArray) result.get(key);
+			}
 		}catch(ClassCastException e) {
 			recordError("Expected list field for key: " + key + ", but got: " + result.get(key));
-			return Collections.emptyList();
 		}
+		return new JSONArray();
 	}
 
-	private int getIntField(Map<String, Object> result, String key) {
+	private int getIntField(JSONObject result, String key) throws JSONException {
 		Object value = result.get(key);
 		if (value instanceof Integer) {
 			return (Integer)value;
+		}else if (value instanceof Long) {
+			return ((Long) value).intValue();
 		}else if (value instanceof String) {
 			return Integer.parseInt((String)value);
 		}
@@ -121,7 +113,7 @@ public class RestaurantJsonParser {
 		return 0;
 	}
 
-	private float getFloatField(Map<String, Object> result, String key) {
+	private float getFloatField(JSONObject result, String key) throws JSONException {
 		Object value = result.get(key);
 		if (value instanceof Double) {
 			return ((Double) value).floatValue();
@@ -134,12 +126,14 @@ public class RestaurantJsonParser {
 		return 0.0f;
 	}
 
-	private Map<String, Object> getMapField(Map<String, Object> result, String key) {
+	private JSONObject getMapField(JSONObject result, String key) throws JSONException {
 		try {
-			return result.get(key) != null ? (Map<String, Object>) result.get(key) : Collections.<String, Object>emptyMap();
+			if (result.get(key) != null) {
+				return(JSONObject) result.get(key);
+			}
 		}catch(ClassCastException e) {
 			recordError("Expected map field for key: " + key + ", but got: " + result.get(key));
-			return Collections.emptyMap();
 		}
+		return new JSONObject();
 	}
 }

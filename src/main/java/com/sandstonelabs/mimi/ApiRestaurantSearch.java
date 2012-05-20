@@ -1,7 +1,6 @@
 package com.sandstonelabs.mimi;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +11,7 @@ public class ApiRestaurantSearch {
 	public static final String SEARCH_URL = "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
 	
-	private final RestaurantJsonParser jsonParser;
-	
-	public ApiRestaurantSearch(RestaurantJsonParser jsonParser) {
-		this.jsonParser = jsonParser;
-	}
-	
-	public List<Restaurant> searchRestaurants(float latitude, float longitude) throws IOException {
+	public List<String> searchRestaurants(float latitude, float longitude) throws IOException {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		
