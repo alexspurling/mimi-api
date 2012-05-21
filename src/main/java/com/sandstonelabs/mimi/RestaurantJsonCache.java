@@ -23,7 +23,7 @@ public class RestaurantJsonCache {
 	private Set<Restaurant> cachedRestaurants = new HashSet<Restaurant>();
 	private Set<String> cachedRestaurantsJson = new HashSet<String>();
 
-	public RestaurantJsonCache(File cacheFile, RestaurantJsonParser jsonParser) throws IOException, JSONException {
+	public RestaurantJsonCache(File cacheFile, RestaurantJsonParser jsonParser) throws IOException {
 		this.cacheFile = cacheFile;
 		this.jsonParser = jsonParser;
 		loadCache(cacheFile);
@@ -33,22 +33,32 @@ public class RestaurantJsonCache {
 		return cachedRestaurants;
 	}
 
-	public void storeResultsInCache(List<String> restaurantJson) throws IOException, JSONException {
+	public void storeResultsInCache(List<String> restaurantJson) throws IOException {
 		for (String jsonData : restaurantJson) {
-			cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(jsonData));
-			cachedRestaurantsJson.add(jsonData);
+			try {
+				cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(jsonData));
+				cachedRestaurantsJson.add(jsonData);
+			}catch (JSONException e) {
+				//TODO log the error somehow
+				//Error parsing Json data, skip this string and don't cache it
+			}
 		}
 		writeCache();
 	}
 
-	private void loadCache(File cacheFile) throws IOException, JSONException {
+	private void loadCache(File cacheFile) throws IOException {
 		cacheFile.createNewFile(); //Creates a new cache file if the given file does not exist
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"));
 		try {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				cachedRestaurantsJson.add(line);
-				cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(line));
+				try {
+					cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(line));
+				}catch (JSONException e) {
+					//TODO log the error somehow
+					//Error parsing cache line, continue onto the next
+				}
 			}
 		} finally {
 			reader.close();

@@ -12,7 +12,8 @@ public class Restaurant {
 	public final String cuisine;
 	public final String foodPrice;
 
-	public final RestaurantRating rating;
+	public final RestaurantRating comfortRating;
+	public final RestaurantRating qualityRating;
 
 	public final String email;
 	public final String phoneNumber;
@@ -35,7 +36,8 @@ public class Restaurant {
 		cuisine = builder.cuisine;
 		foodPrice = builder.foodPrice;
 
-		rating = builder.rating;
+		comfortRating = builder.comfortRating;
+		qualityRating = builder.qualityRating;
 
 		email = builder.email;
 		phoneNumber = builder.phoneNumber;
@@ -60,7 +62,8 @@ public class Restaurant {
 		private String cuisine;
 		private String foodPrice;
 
-		private RestaurantRating rating;
+		private RestaurantRating comfortRating;
+		private RestaurantRating qualityRating;
 
 		private String email;
 		private String phoneNumber;
@@ -112,8 +115,13 @@ public class Restaurant {
 			return this;
 		}
 
-		public RestaurantBuilder rating(RestaurantRating rating) {
-			this.rating = rating;
+		public RestaurantBuilder comfortRating(RestaurantRating comfortRating) {
+			this.comfortRating = comfortRating;
+			return this;
+		}
+
+		public RestaurantBuilder qualityRating(RestaurantRating qualityRating) {
+			this.qualityRating = qualityRating;
 			return this;
 		}
 
@@ -180,9 +188,9 @@ public class Restaurant {
 	@Override
 	public String toString() {
 		return "Restaurant [id=" + id + ", productId=" + productId + ", latitude=" + latitude + ", longitude=" + longitude + ", name=" + name + ", description=" + description
-				+ ", cuisine=" + cuisine + ", foodPrice=" + foodPrice + ", rating=" + rating + ", email=" + email + ", phoneNumber=" + phoneNumber + ", oneLineAddress="
-				+ oneLineAddress + ", address=" + address + ", city=" + city + ", zipCode=" + zipCode + ", countryCode=" + countryCode + ", country=" + country + ", website="
-				+ website + ", restaurantDetails=" + restaurantDetails + "]";
+				+ ", cuisine=" + cuisine + ", foodPrice=" + foodPrice + ", comfortRating=" + comfortRating + ", qualityRating=" + qualityRating + ", email=" + email
+				+ ", phoneNumber=" + phoneNumber + ", oneLineAddress=" + oneLineAddress + ", address=" + address + ", city=" + city + ", zipCode=" + zipCode + ", countryCode="
+				+ countryCode + ", country=" + country + ", website=" + website + ", restaurantDetails=" + restaurantDetails + "]";
 	}
 
 	@Override
@@ -191,6 +199,7 @@ public class Restaurant {
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + ((city == null) ? 0 : city.hashCode());
+		result = prime * result + ((comfortRating == null) ? 0 : comfortRating.hashCode());
 		result = prime * result + ((country == null) ? 0 : country.hashCode());
 		result = prime * result + ((countryCode == null) ? 0 : countryCode.hashCode());
 		result = prime * result + ((cuisine == null) ? 0 : cuisine.hashCode());
@@ -204,7 +213,7 @@ public class Restaurant {
 		result = prime * result + ((oneLineAddress == null) ? 0 : oneLineAddress.hashCode());
 		result = prime * result + ((phoneNumber == null) ? 0 : phoneNumber.hashCode());
 		result = prime * result + productId;
-		result = prime * result + ((rating == null) ? 0 : rating.hashCode());
+		result = prime * result + ((qualityRating == null) ? 0 : qualityRating.hashCode());
 		result = prime * result + ((restaurantDetails == null) ? 0 : restaurantDetails.hashCode());
 		result = prime * result + ((website == null) ? 0 : website.hashCode());
 		result = prime * result + ((zipCode == null) ? 0 : zipCode.hashCode());
@@ -229,6 +238,11 @@ public class Restaurant {
 			if (other.city != null)
 				return false;
 		} else if (!city.equals(other.city))
+			return false;
+		if (comfortRating == null) {
+			if (other.comfortRating != null)
+				return false;
+		} else if (!comfortRating.equals(other.comfortRating))
 			return false;
 		if (country == null) {
 			if (other.country != null)
@@ -283,10 +297,10 @@ public class Restaurant {
 			return false;
 		if (productId != other.productId)
 			return false;
-		if (rating == null) {
-			if (other.rating != null)
+		if (qualityRating == null) {
+			if (other.qualityRating != null)
 				return false;
-		} else if (!rating.equals(other.rating))
+		} else if (!qualityRating.equals(other.qualityRating))
 			return false;
 		if (restaurantDetails == null) {
 			if (other.restaurantDetails != null)

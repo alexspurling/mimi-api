@@ -18,7 +18,7 @@ public class RestaurantJsonParser {
 		return parseRestaurantSearchResult(new JSONObject(jsonData));
 	}
 	
-	private Restaurant parseRestaurantSearchResult(JSONObject result) throws JSONException {
+	private Restaurant parseRestaurantSearchResult(JSONObject result) {
 		
 		//Parse the expected fields
 		int id = getIntField(result, "id");
@@ -31,7 +31,14 @@ public class RestaurantJsonParser {
 		String cuisine = getListItem(getListField(result, "vE"), 6);
 		String foodPrice = getListItem(getListField(result, "vE"), 4);
 		
-		RestaurantRating restaurantRating = getRestaurantRating(getListField(result, "CY"));
+		JSONArray ratingsList = getListField(result, "CY");
+		String comfortRatingImage = getListItem(ratingsList, 2);
+		String comfortRatingDescription = getListItem(ratingsList, 3);
+		RestaurantRating comfortRating = getRestaurantRating(comfortRatingImage, comfortRatingDescription);
+		
+		String qualityRatingImage = getListItem(ratingsList, 4);
+		String qualityRatingDescription = getListItem(ratingsList, 5);
+		RestaurantRating qualityRating = getRestaurantRating(qualityRatingImage, qualityRatingDescription);
 		
 		String email = getField(result, "Ik");
 		String phoneNumber = getField(result, "telephone");
@@ -53,7 +60,8 @@ public class RestaurantJsonParser {
 		description(description).
 		cuisine(cuisine).
 		foodPrice(foodPrice).
-		rating(restaurantRating).
+		comfortRating(comfortRating).
+		qualityRating(qualityRating).
 		email(email).
 		phoneNumber(phoneNumber).
 		oneLineAddress(oneLineAddress).
@@ -66,37 +74,40 @@ public class RestaurantJsonParser {
 		
 		return builder.build();
 	}
-
-	private RestaurantRating getRestaurantRating(JSONArray listField) throws JSONException {
-		String ratingImage = getListItem(listField, 2);
+	
+	private RestaurantRating getRestaurantRating(String ratingImage, String ratingDescription) {
 		String ratingImageFile = ratingImage.replaceFirst(".*/(.*)", "$1");
-		
 		if ("1_12.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(1, RatingType.COMFORTABLE);
+			return new RestaurantRating(1, RatingType.COMFORTABLE, ratingDescription);
 		}else if ("1_13.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(2, RatingType.COMFORTABLE);
+			return new RestaurantRating(2, RatingType.COMFORTABLE, ratingDescription);
 		}else if ("1_14.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(3, RatingType.COMFORTABLE);
+			return new RestaurantRating(3, RatingType.COMFORTABLE, ratingDescription);
 		}else if ("1_15.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(4, RatingType.COMFORTABLE);
+			return new RestaurantRating(4, RatingType.COMFORTABLE, ratingDescription);
 		}else if ("1_16.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(5, RatingType.COMFORTABLE);
+			return new RestaurantRating(5, RatingType.COMFORTABLE, ratingDescription);
 		}else if ("1_17.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(1, RatingType.PLEASANT);
+			return new RestaurantRating(1, RatingType.PLEASANT, ratingDescription);
 		}else if ("1_18.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(2, RatingType.PLEASANT);
+			return new RestaurantRating(2, RatingType.PLEASANT, ratingDescription);
 		}else if ("1_19.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(3, RatingType.PLEASANT);
+			return new RestaurantRating(3, RatingType.PLEASANT, ratingDescription);
 		}else if ("1_20.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(4, RatingType.PLEASANT);
+			return new RestaurantRating(4, RatingType.PLEASANT, ratingDescription);
 		}else if ("1_21.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(5, RatingType.PLEASANT);
+			return new RestaurantRating(5, RatingType.PLEASANT, ratingDescription);
 		}else if ("1_282.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(1, RatingType.PUB);
+			return new RestaurantRating(1, RatingType.PUB, ratingDescription);
 		}else if ("1_504.gif".equals(ratingImageFile)) {
-			return new RestaurantRating(1, RatingType.HOTEL);
+			return new RestaurantRating(1, RatingType.HOTEL, ratingDescription);
+		}else if ("4_1.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(1, RatingType.MICHELIN_STAR, ratingDescription);
+		}else if ("4_2.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(2, RatingType.MICHELIN_STAR, ratingDescription);
+		}else if ("4_3.gif".equals(ratingImageFile)) {
+			return new RestaurantRating(3, RatingType.MICHELIN_STAR, ratingDescription);
 		}
-		
 		return null;
 	}
 
@@ -108,36 +119,18 @@ public class RestaurantJsonParser {
 		return errors;
 	}
 
-	private String getField(JSONObject result, String key) throws JSONException {
+	private String getField(JSONObject result, String key) {
+		Object value = getJsonValue(result, key);
 		try {
-			return (String) result.get(key);
+			return (String) value;
 		}catch(ClassCastException e) {
-			recordError("Field not found: " + key);
+			recordError("Expected string field for key: " + key + ", but got " + value);
 			return null;
 		}
 	}
 
-	private String getListItem(JSONArray listField, int i) throws JSONException {
-		if (i < listField.length()) {
-			return (String)listField.get(i);
-		}
-		recordError("Index not found in list. Index: " + i + ", list size: " + listField.length());
-		return null;
-	}
-
-	private JSONArray getListField(JSONObject result, String key) throws JSONException {
-		try {
-			if (result.get(key) != null) {
-				return (JSONArray) result.get(key);
-			}
-		}catch(ClassCastException e) {
-			recordError("Expected list field for key: " + key + ", but got: " + result.get(key));
-		}
-		return new JSONArray();
-	}
-
-	private int getIntField(JSONObject result, String key) throws JSONException {
-		Object value = result.get(key);
+	private int getIntField(JSONObject result, String key) {
+		Object value = getJsonValue(result, key);
 		if (value instanceof Integer) {
 			return (Integer)value;
 		}else if (value instanceof Long) {
@@ -149,8 +142,8 @@ public class RestaurantJsonParser {
 		return 0;
 	}
 
-	private float getFloatField(JSONObject result, String key) throws JSONException {
-		Object value = result.get(key);
+	private float getFloatField(JSONObject result, String key) {
+		Object value = getJsonValue(result, key);
 		if (value instanceof Double) {
 			return ((Double) value).floatValue();
 		}else if (value instanceof Float) {
@@ -162,14 +155,61 @@ public class RestaurantJsonParser {
 		return 0.0f;
 	}
 
-	private JSONObject getMapField(JSONObject result, String key) throws JSONException {
+	private String getListItem(JSONArray jsonArray, int index) {
+		Object value = getJsonValueFromArray(jsonArray, index);
 		try {
-			if (result.get(key) != null) {
-				return(JSONObject) result.get(key);
+			return (String) value;
+		}catch(ClassCastException e) {
+			recordError("Expected string field at array index " + index + ", but got: " + value);
+		}
+		return null;
+	}
+
+	private JSONArray getListField(JSONObject result, String key) {
+		Object value = getJsonValue(result, key);
+		try {
+			if (value != null) {
+				return (JSONArray) value;
 			}
 		}catch(ClassCastException e) {
-			recordError("Expected map field for key: " + key + ", but got: " + result.get(key));
+			recordError("Expected list field for key: " + key + ", but got: " + value);
+		}
+		return new JSONArray();
+	}
+
+	private JSONObject getMapField(JSONObject result, String key) {
+		Object value = getJsonValue(result, key);
+		try {
+			if (value != null) {
+				return(JSONObject) value;
+			}
+		}catch(ClassCastException e) {
+			recordError("Expected map field for key: " + key + ", but got: " + value);
 		}
 		return new JSONObject();
 	}
+	
+	private Object getJsonValue(JSONObject jsonObject, String key) {
+		try {
+			return jsonObject.get(key);
+		}catch(JSONException e) {
+			recordError("JSON field not found. key: " + key + ", object: " + jsonObject);
+		}
+		return null;
+	}
+	
+	private Object getJsonValueFromArray(JSONArray jsonArray, int index) {
+		if (index < jsonArray.length()) {
+			try {
+				return jsonArray.get(index);
+			}catch(JSONException e) {
+				//Should never happen as we have already checked the array length
+				recordError("JSON field not found in array. Index: " + index + ", array: " + jsonArray);
+			}
+		}else{
+			recordError("Index not found in array. Index: " + index + ", array size: " + jsonArray.length());
+		}
+		return null;
+	}
+	
 }

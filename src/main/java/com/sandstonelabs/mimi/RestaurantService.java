@@ -36,7 +36,7 @@ public class RestaurantService {
 		return getRestaurantsAtLocation(cachedRestaurants, latitude, longitude, maxDistance);
 	}
 	
-	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws IOException, JSONException {
+	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws IOException {
 		List<String> restaurantSearchJson = apiRestaurantSearch.searchRestaurants(latitude, longitude);
 		restaurantJsonCache.storeResultsInCache(restaurantSearchJson);
 		return getCachedRestaurantsAtLocation(latitude, longitude, maxDistance);

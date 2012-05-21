@@ -10,13 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.json.JSONException;
 import org.junit.Test;
 
 public class RestaurantServiceTest {
 
 	@Test
-	public void testCachedRestaurantsAtLocation_emptyCacheFile_returnsEmptyList() throws IOException, JSONException {
+	public void testCachedRestaurantsAtLocation_emptyCacheFile_returnsEmptyList() throws IOException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
 		File cacheFile = newEmptyCacheFile();
@@ -34,7 +33,7 @@ public class RestaurantServiceTest {
 	}
 	
 	@Test
-	public void testCachedRestaurantsAtLocation_returnsFilteredListFromCacheFile() throws IOException, JSONException {
+	public void testCachedRestaurantsAtLocation_returnsFilteredListFromCacheFile() throws IOException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
 		File cacheFile = newCacheFileWithExampleData();
