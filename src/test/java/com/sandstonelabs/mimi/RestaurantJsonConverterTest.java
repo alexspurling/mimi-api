@@ -23,7 +23,7 @@ public class RestaurantJsonConverterTest {
 			longitude(-0.1633f).
 			name("Phoenix").
 			description("Friendly, conscientiously run Chelsea local, where satisfying and carefully prepared pub classics are served in the roomy, civilised bar or in the warm, comfortable dining room at the back.").
-			cuisine("modern").
+			cuisine("Modern").
 			foodPrice("Carte: 21£/34£").
 			comfortRating(new RestaurantRating(1, RatingType.PUB, "Traditional pubs serving food")).
 			email("thephoenix@geronimo-inns.co.uk").

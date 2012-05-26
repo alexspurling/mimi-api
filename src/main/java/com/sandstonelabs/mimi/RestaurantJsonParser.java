@@ -28,7 +28,7 @@ public class RestaurantJsonParser {
 		
 		String name = getField(result, "name");
 		String description = getListItem(getListField(result, "vE"), 7);
-		String cuisine = getListItem(getListField(result, "vE"), 6);
+		String cuisine = capitalise(getListItem(getListField(result, "vE"), 6));
 		String foodPrice = getListItem(getListField(result, "vE"), 4);
 		
 		JSONArray ratingsList = getListField(result, "CY");
@@ -75,6 +75,17 @@ public class RestaurantJsonParser {
 		return builder.build();
 	}
 	
+	/** Capitalise the first letter of the given string */
+	private String capitalise(String string) {
+		if (string != null && !string.isEmpty()) {
+			char firstLetter = string.charAt(0);
+			if (Character.isLowerCase(firstLetter)) {
+				return Character.toUpperCase(firstLetter) + string.substring(1);
+			}
+		}
+		return string;
+	}
+
 	private RestaurantRating getRestaurantRating(String ratingImage, String ratingDescription) {
 		String ratingImageFile = ratingImage.replaceFirst(".*/(.*)", "$1");
 		if ("1_12.gif".equals(ratingImageFile)) {

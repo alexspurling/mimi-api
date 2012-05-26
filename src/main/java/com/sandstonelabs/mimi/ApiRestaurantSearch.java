@@ -35,7 +35,6 @@ public class ApiRestaurantSearch {
 		wr.close();
 
 		StringBuilder searchResponse = getResponse(connection);
-		System.out.println("Got api response: " + searchResponse);
 		
 		return parseJsonFromResponse(searchResponse.toString());
 	}
