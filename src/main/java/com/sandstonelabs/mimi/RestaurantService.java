@@ -29,15 +29,15 @@ public class RestaurantService {
 		this.restaurantJsonCache = restaurantJsonCache;
 	}
 	
-	public List<Restaurant> getCachedRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws IOException {
+	public List<Restaurant> getCachedRestaurantsAtLocation(float latitude, float longitude, int maxDistance, int maxResults) throws IOException {
 		Set<Restaurant> cachedRestaurants = restaurantJsonCache.getAllCachedRestaurants();
-		return getRestaurantsAtLocation(cachedRestaurants, latitude, longitude, maxDistance);
+		return getRestaurantsAtLocation(cachedRestaurants, latitude, longitude, maxDistance, maxResults);
 	}
 	
-	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int maxDistance) throws IOException {
+	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int maxDistance, int maxResults) throws IOException {
 		List<String> restaurantSearchJson = apiRestaurantSearch.searchRestaurants(latitude, longitude);
 		restaurantJsonCache.storeResultsInCache(restaurantSearchJson);
-		return getCachedRestaurantsAtLocation(latitude, longitude, maxDistance);
+		return getCachedRestaurantsAtLocation(latitude, longitude, maxDistance, maxResults);
 	}
 	
 	private static final Comparator<Entry<Restaurant, Integer>> restaurantDistanceComparator = new Comparator<Entry<Restaurant, Integer>>() {
@@ -47,7 +47,7 @@ public class RestaurantService {
 		}
 	};
 	
-	private List<Restaurant> getRestaurantsAtLocation(Collection<Restaurant> restaurants, float latitude, float longitude, int maxDistance) {
+	private List<Restaurant> getRestaurantsAtLocation(Collection<Restaurant> restaurants, float latitude, float longitude, int maxDistance, int maxResults) {
 		//Get all the results from the cache and filter by location
 		final LatLng searchLocation = new LatLng(latitude, longitude);
 		
@@ -68,9 +68,14 @@ public class RestaurantService {
 		List<Entry<Restaurant, Integer>> restaurantEntryList = new ArrayList<Entry<Restaurant, Integer>>(restaurantDistanceMap.entrySet());
 		Collections.sort(restaurantEntryList, restaurantDistanceComparator);
 		
+		int count = 0;
 		List<Restaurant> sortedRestaurants = new ArrayList<Restaurant>();
 		for (Entry<Restaurant, Integer> restaurantEntry : restaurantEntryList) {
+			if (count >= maxResults) {
+				break;
+			}
 			sortedRestaurants.add(restaurantEntry.getKey());
+			count++;
 		}
 		
 		return sortedRestaurants;

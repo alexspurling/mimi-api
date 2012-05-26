@@ -26,14 +26,16 @@ public class RestaurantServiceTest {
 		
 		float lat = 51.4915f;
 		float lon = -0.1650f;
+		int maxDistance = 300;
+		int maxResults = 20;
 		
-		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, 300);
+		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
 		
 		assertTrue(restaurants.isEmpty());
 	}
 	
 	@Test
-	public void testCachedRestaurantsAtLocation_returnsFilteredListFromCacheFile() throws IOException {
+	public void testCachedRestaurantsAtLocation_returnsWithinRangeListFromCacheFile() throws IOException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
 		File cacheFile = newCacheFileWithExampleData();
@@ -44,13 +46,36 @@ public class RestaurantServiceTest {
 		float lat = 51.4915f;
 		float lon = -0.1650f;
 		int maxDistance = 300;
+		int maxResults = 20;
 		
-		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance);
+		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
 		
 		for (Restaurant restaurant : restaurants) {
 			System.out.println(restaurant);
 		}
 		assertEquals(7, restaurants.size());
+	}
+	
+	@Test
+	public void testCachedRestaurantsAtLocation_returnsWithinLimitListFromCacheFile() throws IOException {
+		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
+		
+		File cacheFile = newCacheFileWithExampleData();
+		
+		RestaurantJsonCache restaurantJsonCache = new RestaurantJsonCache(cacheFile, jsonParser);
+		RestaurantService restaurantService = new RestaurantService(null, restaurantJsonCache);
+		
+		float lat = 51.4915f;
+		float lon = -0.1650f;
+		int maxDistance = 300;
+		int maxResults = 5;
+		
+		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		
+		for (Restaurant restaurant : restaurants) {
+			System.out.println(restaurant);
+		}
+		assertEquals(5, restaurants.size());
 	}
 
 	private File newEmptyCacheFile() throws IOException {
