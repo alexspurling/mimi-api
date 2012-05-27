@@ -34,10 +34,9 @@ public class RestaurantService {
 		return getRestaurantsAtLocation(cachedRestaurants, latitude, longitude, maxDistance, maxResults);
 	}
 	
-	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int maxDistance, int maxResults) throws IOException {
-		List<String> restaurantSearchJson = apiRestaurantSearch.searchRestaurants(latitude, longitude);
-		restaurantJsonCache.storeResultsInCache(restaurantSearchJson);
-		return getCachedRestaurantsAtLocation(latitude, longitude, maxDistance, maxResults);
+	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int page) throws IOException {
+		List<String> restaurantSearchJson = apiRestaurantSearch.searchRestaurants(latitude, longitude, page);
+		return restaurantJsonCache.storeResultsInCache(restaurantSearchJson);
 	}
 	
 	private static final Comparator<Entry<Restaurant, Integer>> restaurantDistanceComparator = new Comparator<Entry<Restaurant, Integer>>() {

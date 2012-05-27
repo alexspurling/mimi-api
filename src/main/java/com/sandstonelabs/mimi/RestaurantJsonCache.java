@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,10 +34,13 @@ public class RestaurantJsonCache {
 		return cachedRestaurants;
 	}
 
-	public void storeResultsInCache(List<String> restaurantJson) throws IOException {
+	public List<Restaurant> storeResultsInCache(List<String> restaurantJson) throws IOException {
+		List<Restaurant> restaurants = new ArrayList<Restaurant>();
 		for (String jsonData : restaurantJson) {
 			try {
-				cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(jsonData));
+				Restaurant restaurant = jsonParser.parseRestaurantSearchResultsFromJson(jsonData);
+				restaurants.add(restaurant);
+				cachedRestaurants.add(restaurant);
 				cachedRestaurantsJson.add(jsonData);
 			}catch (JSONException e) {
 				//TODO log the error somehow
@@ -44,6 +48,7 @@ public class RestaurantJsonCache {
 			}
 		}
 		writeCache();
+		return restaurants;
 	}
 
 	private void loadCache(File cacheFile) throws IOException {

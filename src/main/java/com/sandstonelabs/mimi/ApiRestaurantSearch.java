@@ -18,12 +18,12 @@ public class ApiRestaurantSearch {
 	public static final String SEARCH_URL = BASE_URL + "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = BASE_URL + "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
 
-	public List<String> searchRestaurants(float latitude, float longitude) throws IOException {
+	public List<String> searchRestaurants(float latitude, float longitude, int page) throws IOException {
 
 		URL searchURL = new URL(SEARCH_URL);
 		HttpURLConnection connection = (HttpURLConnection) searchURL.openConnection();
 
-		String searchParameters = getSearchParameters(latitude, longitude);
+		String searchParameters = getSearchParameters(latitude, longitude, page);
 
 		connection.setRequestProperty("Content-Length", String.valueOf(searchParameters.getBytes().length));
 		connection.setDoOutput(true);
@@ -78,16 +78,16 @@ public class ApiRestaurantSearch {
 		}
 	}
 
-	private String getSearchParameters(float latitude, float longitude) {
+	private String getSearchParameters(float latitude, float longitude, int page) {
 		return "lang=gbr&ie=UTF-8&charset=UTF-8&typeJs=simplePoi&" + 
 				"strCoord=" + longitude + "*" + latitude + "&" + 
 				"treatment=RestaurantSearch&listCode=GR&empriseH=0&" + 
 				"empriseW=0&psize=0&spatialType=concentric&sortBy=distance&" + 
-				"page=1&charset=UTF-8&callBack=JSE.cr.pv[14].cv&version=&" + 
+				"page=" + page + "&charset=UTF-8&callBack=JSE.cr.pv[14].cv&version=&" + 
 				"from=RESTAURANT_RESULT&lang=int";
 	}
 
-	public String getRestaurantDetailsParameters(Restaurant restaurant) {
+	private String getRestaurantDetailsParameters(Restaurant restaurant) {
 		return "lang=gbr&ie=UTF-8&charset=UTF-8&typeJs=jsePoi&" + 
 				"poiType=true&productId=" + restaurant.productId + "&" + 
 				"id=" + restaurant.id + "&zoomLevel=13&" + 

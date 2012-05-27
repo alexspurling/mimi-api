@@ -50,13 +50,14 @@ public class ApiRestaurantSearchTest {
 		assertEquals(expectedResults, results);
 	}
 	
-	@Test @Ignore
+	@Test @Ignore("Test is disabled as it will call the remote api")
 	public void testSearchFromLocation_getExpectedResults() throws IOException {
 		ApiRestaurantSearch apiRestaurantSearch = new ApiRestaurantSearch();
 		
 		float latitude = 51.49348f;
 		float longitude = -0.16716f;
-		List<String> results = apiRestaurantSearch.searchRestaurants(latitude, longitude);
+		int page = 1;
+		List<String> results = apiRestaurantSearch.searchRestaurants(latitude, longitude, page);
 		
 		assertEquals(expectedResults, results);
 	}
