@@ -17,6 +17,8 @@ import org.json.JSONException;
 
 public class RestaurantJsonCache {
 
+	private static final int maxCacheSize = 100;
+	
 	private final File cacheFile;
 	private final RestaurantJsonParser jsonParser;
 
@@ -37,6 +39,7 @@ public class RestaurantJsonCache {
 	public List<Restaurant> storeResultsInCache(List<String> restaurantJson) throws IOException {
 		List<Restaurant> restaurants = new ArrayList<Restaurant>();
 		for (String jsonData : restaurantJson) {
+			
 			try {
 				Restaurant restaurant = jsonParser.parseRestaurantSearchResultsFromJson(jsonData);
 				restaurants.add(restaurant);
@@ -56,10 +59,12 @@ public class RestaurantJsonCache {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"));
 		try {
 			String line;
-			while ((line = reader.readLine()) != null) {
+			int cacheSize = 0;
+			while ((line = reader.readLine()) != null && cacheSize < maxCacheSize) {
 				cachedRestaurantsJson.add(line);
 				try {
 					cachedRestaurants.add(jsonParser.parseRestaurantSearchResultsFromJson(line));
+					cacheSize++;
 				}catch (JSONException e) {
 					//TODO log the error somehow
 					//Error parsing cache line, continue onto the next
@@ -73,8 +78,13 @@ public class RestaurantJsonCache {
 	private void writeCache() throws IOException {
 		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile)));
 		try {
+			int cacheSize = 0;
 			for (String restaurantJson : cachedRestaurantsJson) {
+				if (cacheSize >= maxCacheSize) {
+					break;
+				}
 				writer.println(restaurantJson);
+				cacheSize++;
 			}
 		}finally{
 			writer.close();
