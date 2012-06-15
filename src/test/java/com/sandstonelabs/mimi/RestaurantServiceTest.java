@@ -28,8 +28,9 @@ public class RestaurantServiceTest {
 		float lon = -0.1650f;
 		int maxDistance = 300;
 		int maxResults = 20;
-		
-		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		assertTrue(restaurants.isEmpty());
 	}
@@ -48,7 +49,8 @@ public class RestaurantServiceTest {
 		int maxDistance = 300;
 		int maxResults = 20;
 		
-		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		for (Restaurant restaurant : restaurants) {
 			System.out.println(restaurant);
@@ -70,7 +72,8 @@ public class RestaurantServiceTest {
 		int maxDistance = 300;
 		int maxResults = 5;
 		
-		List<Restaurant> restaurants = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		for (Restaurant restaurant : restaurants) {
 			System.out.println(restaurant);
