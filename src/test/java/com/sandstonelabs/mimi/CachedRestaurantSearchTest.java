@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.json.JSONException;
 import org.junit.Test;
@@ -17,9 +16,9 @@ public class CachedRestaurantSearchTest {
 	public void teststoreResultsInCache_WriteToEmptyCacheFile_newEntriesAreRecorded() throws IOException, JSONException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
-		File cacheFile = newEmptyCacheFile();
+		File cacheDirectory = clearCacheDirectory();
 		
-		RestaurantJsonCache restaurantJsonCache1 = new RestaurantJsonCache(cacheFile, jsonParser);
+		RestaurantJsonCache restaurantJsonCache1 = new RestaurantJsonCache(cacheDirectory, jsonParser);
 		
 		float searchLatitude = 51.493f;
 		float searchLongitude = -0.168f;
@@ -29,9 +28,10 @@ public class CachedRestaurantSearchTest {
 		
 		restaurantJsonCache1.storeResultsInCache(jsonToBeStored, searchLatitude, searchLongitude);
 		
-		RestaurantJsonCache restaurantJsonCache2 = new RestaurantJsonCache(cacheFile, jsonParser);
+		RestaurantJsonCache restaurantJsonCache2 = new RestaurantJsonCache(cacheDirectory, jsonParser);
 		
-		Set<Restaurant> allCachedRestaurants = restaurantJsonCache2.getAllCachedRestaurants();
+		RestaurantResults restaurantResults = restaurantJsonCache2.getRestaurantsAtLocation(searchLatitude, searchLongitude, 100, 10);
+		List<Restaurant> allCachedRestaurants = restaurantResults.restaurants;
 		
 		Restaurant restaurant1 = jsonParser.parseRestaurantSearchResultsFromJson(restaurantString1);
 		Restaurant restaurant2 = jsonParser.parseRestaurantSearchResultsFromJson(restaurantString2);
@@ -44,11 +44,11 @@ public class CachedRestaurantSearchTest {
 		assertTrue(allCachedRestaurants.containsAll(expectedRestaurants));
 	}
 
-	private File newEmptyCacheFile() throws IOException {
-		File cacheFile = new File("test-cache.txt");
-		cacheFile.delete(); //Make sure the file does not exist
-		return cacheFile;
+	private File clearCacheDirectory() {
+		new File(RestaurantJsonCache.RESTAURANT_CACHE_FILE).delete();
+		new File(RestaurantJsonCache.AREA_CACHE_FILE).delete();
+		return new File(".");
 	}
-	
+
 }
 

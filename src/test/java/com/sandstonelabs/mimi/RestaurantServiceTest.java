@@ -18,9 +18,9 @@ public class RestaurantServiceTest {
 	public void testCachedRestaurantsAtLocation_emptyCacheFile_returnsEmptyList() throws IOException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
-		File cacheFile = newEmptyCacheFile();
+		File cacheDirectory = clearCacheDirectory();
 		
-		RestaurantJsonCache restaurantJsonCache = new RestaurantJsonCache(cacheFile, jsonParser);
+		RestaurantJsonCache restaurantJsonCache = new RestaurantJsonCache(cacheDirectory, jsonParser);
 		
 		RestaurantService restaurantService = new RestaurantService(null, restaurantJsonCache);
 		
@@ -81,17 +81,18 @@ public class RestaurantServiceTest {
 		assertEquals(5, restaurants.size());
 	}
 
-	private File newEmptyCacheFile() throws IOException {
-		File cacheFile = new File("test-cache.txt");
-		cacheFile.delete(); //Make sure the file does not exist
-		return cacheFile;
+	private File clearCacheDirectory() {
+		new File(RestaurantJsonCache.RESTAURANT_CACHE_FILE).delete();
+		new File(RestaurantJsonCache.AREA_CACHE_FILE).delete();
+		return new File(".");
 	}
 
 	private File newCacheFileWithExampleData() throws IOException {
-		File cacheFile = new File("test-cache.txt");
+		File cacheDir = clearCacheDirectory();
+		File cacheFile = new File(RestaurantJsonCache.RESTAURANT_CACHE_FILE);
 		InputStream exampleData = this.getClass().getResourceAsStream("/example-data.txt");
 		copyInputStreamToFile(exampleData, cacheFile);
-		return cacheFile;
+		return cacheDir;
 	}
 
 	private void copyInputStreamToFile(InputStream exampleData, File cacheFile) throws IOException {

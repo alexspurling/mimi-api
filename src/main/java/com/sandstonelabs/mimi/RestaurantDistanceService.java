@@ -1,10 +1,10 @@
 package com.sandstonelabs.mimi;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,13 +24,14 @@ public class RestaurantDistanceService {
 		return searchRadius;
 	}
 	
-	public List<Restaurant> filterRestaurantsAtLocation(Collection<Restaurant> restaurants, float latitude, float longitude, int maxDistance, int maxResults) {
+	public List<Restaurant> filterRestaurantsAtLocation(Iterator<Restaurant> restaurantList, float latitude, float longitude, int maxDistance, int maxResults) {
 		//Get all the results from the cache and filter by location
 		final LatLng searchLocation = new LatLng(latitude, longitude);
 		
 		Map<Restaurant, Integer> restaurantDistanceMap = new HashMap<Restaurant, Integer>();
 		
-		for (Restaurant restaurant : restaurants) {
+		Restaurant restaurant;
+		while (restaurantList.hasNext() && (restaurant = restaurantList.next()) != null) {
 			LatLng restaurantLocation = new LatLng(restaurant.latitude, restaurant.longitude);
 			double distance = LatLngTool.distance(searchLocation, restaurantLocation, LengthUnit.METER);
 			if (distance <= maxDistance) {
