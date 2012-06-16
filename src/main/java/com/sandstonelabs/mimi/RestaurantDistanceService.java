@@ -9,18 +9,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
 public class RestaurantDistanceService {
+	
+	Logger log = LoggerFactory.getLogger(RestaurantDistanceService.class);
 
 	public double getFurthestRestaurantDistance(float latitude, float longitude, List<Restaurant> restaurantsAtLocation) {
 		final LatLng searchLocation = new LatLng(latitude, longitude);
+		
+		log.info("Getting furthest restaurant from (" + latitude + ", " + longitude + ")");
+		
 		//Assume the restaurants are ordered nearest to farthest
 		Restaurant furthestRestaurant = restaurantsAtLocation.get(restaurantsAtLocation.size()-1);
 		LatLng furthestRestaurantLocation = new LatLng(furthestRestaurant.latitude, furthestRestaurant.longitude);
 		double searchRadius = LatLngTool.distance(searchLocation, furthestRestaurantLocation, LengthUnit.METER);
+
+		log.info("Furthest restaurant distance " + searchRadius + ": " + furthestRestaurant);
+		
 		return searchRadius;
 	}
 	

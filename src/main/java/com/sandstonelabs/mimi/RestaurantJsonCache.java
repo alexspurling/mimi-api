@@ -9,20 +9,27 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.EvictionListener;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
 public class RestaurantJsonCache {
+	
+	private static final Logger log = LoggerFactory.getLogger(RestaurantJsonCache.class);
 
 	private static final int MAX_CACHE_SIZE = 100;
 
@@ -38,6 +45,13 @@ public class RestaurantJsonCache {
 
 	private ConcurrentMap<Integer, RestaurantCacheEntry> cachedRestaurants;
 	private ConcurrentMap<LatLng, RestaurantArea> cachedAreas = new ConcurrentHashMap<LatLng, RestaurantArea>();
+
+	private EvictionListener<Integer, RestaurantCacheEntry> cacheEvictionListener = new EvictionListener<Integer, RestaurantCacheEntry>() {
+		@Override
+		public void onEviction(Integer key, RestaurantCacheEntry value) {
+			log.info("Evicting restaurant with id " + key + ": " + value.restaurant);
+		}
+	};
 	
 	public RestaurantJsonCache(File cacheLocation, RestaurantJsonParser jsonParser) throws IOException {
 		this.restaurantCacheFile = new File(cacheLocation, RESTAURANT_CACHE_FILE);
@@ -50,6 +64,9 @@ public class RestaurantJsonCache {
 		List<Restaurant> restaurants = new ArrayList<Restaurant>();
 		
 		LatLng searchLocation = new LatLng(latitude, longitude);
+		
+		log.info("Storing " + restaurantJson.size() + " results in cache. Current cache size is " + cachedRestaurants.size());
+		
 		double maxRestaurantDistance = 0;
 		for (String jsonData : restaurantJson) {
 			
@@ -58,6 +75,8 @@ public class RestaurantJsonCache {
 				restaurants.add(restaurant);
 				RestaurantCacheEntry restaurantCacheEntry = new RestaurantCacheEntry(restaurant, jsonData);
 				cachedRestaurants.put(restaurant.id, restaurantCacheEntry);
+
+				log.info("Storing restaurant: " + restaurant.name);
 				
 				//TODO can we just assume the last restaurant is the most distant?
 				maxRestaurantDistance = maxDistance(searchLocation, restaurant, maxRestaurantDistance);
@@ -83,14 +102,24 @@ public class RestaurantJsonCache {
 
 	private void storeArea(List<Restaurant> restaurants, LatLng searchLocation, double maxRestaurantDistance) {
 		RestaurantArea cachedArea = cachedAreas.get(searchLocation);
-		if (cachedArea == null) {
-			List<Integer> restaurantIds = new ArrayList<Integer>();
-			for (Restaurant restaurant : restaurants) {
-				restaurantIds.add(restaurant.id);
-			}
-			cachedArea = new RestaurantArea(searchLocation, maxRestaurantDistance, restaurantIds);
-			cachedAreas.put(searchLocation, cachedArea);
+		
+		Set<Integer> restaurantIds;
+		if (cachedArea != null) {
+			//Let's keep the stored list of restaurant ids for this location
+			restaurantIds = cachedArea.restaurantIds;
+		}else{
+			restaurantIds = new HashSet<Integer>();
 		}
+		
+		//Add the restaurant ids of the new restaurants to store
+		for (Restaurant restaurant : restaurants) {
+			restaurantIds.add(restaurant.id);
+		}
+		cachedArea = new RestaurantArea(searchLocation, maxRestaurantDistance, restaurantIds);
+
+		log.info("Storing area location: " + searchLocation + ", radius: " + maxRestaurantDistance + ", ids: " + restaurantIds);
+		
+		cachedAreas.put(searchLocation, cachedArea);
 	}
 
 	private void loadCache() throws IOException {
@@ -103,6 +132,7 @@ public class RestaurantJsonCache {
 		//TODO add an EvictionListener
 		cachedRestaurants = new ConcurrentLinkedHashMap.Builder<Integer, RestaurantCacheEntry>()
 			    .maximumWeightedCapacity(MAX_CACHE_SIZE)
+			    .listener(cacheEvictionListener)
 			    .build();
 		
 		restaurantCacheFile.createNewFile(); //Creates a new cache file if the given file does not exist
@@ -207,6 +237,10 @@ public class RestaurantJsonCache {
 		
 		LatLng searchLocation = new LatLng(latitude, longitude);
 		
+		log.info("Checking cached areas for location " + searchLocation + " within raduis " + searchRadius);
+		
+		log.info("Areas cached: " + cachedAreas.size());
+		
 		//For each of the cached regions, check to see if our search region
 		//lies completely within it. If so then all our results can be safely
 		//retrieved from the cache
@@ -214,7 +248,11 @@ public class RestaurantJsonCache {
 			LatLng cachedLocation = cachedArea.getKey();
 			double cachedRadius = cachedArea.getValue().radius;
 			double distance = LatLngTool.distance(searchLocation, cachedLocation, LengthUnit.METER);
+
+			log.info("Area location: " + cachedLocation + ", radius: " + cachedRadius + ", distance: " + distance + ", search radius + distance: " + (distance + searchRadius));
+			
 			if (distance + searchRadius <= cachedRadius) {
+				log.info("Cached area found at location " + cachedLocation);
 				return true;
 			}
 		}

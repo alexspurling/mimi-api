@@ -58,6 +58,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.javadocmd</groupId>
 			<artifactId>simplelatlng</artifactId>
 			<version>1.0.1</version>
