@@ -7,9 +7,9 @@ import com.javadocmd.simplelatlng.LatLng;
 
 public class RestaurantArea {
 
-	public final LatLng location;
-	public final double radius;
-	public final Set<Integer> restaurantIds;
+	public LatLng location;
+	public double radius;
+	public Set<Integer> restaurantIds;
 	
 	public RestaurantArea(LatLng location, double radius, Set<Integer> restaurantIds) {
 		this.location = location;

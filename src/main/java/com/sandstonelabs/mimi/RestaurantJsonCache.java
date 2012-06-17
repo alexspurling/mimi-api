@@ -48,8 +48,9 @@ public class RestaurantJsonCache {
 
 	private EvictionListener<Integer, RestaurantCacheEntry> cacheEvictionListener = new EvictionListener<Integer, RestaurantCacheEntry>() {
 		@Override
-		public void onEviction(Integer key, RestaurantCacheEntry value) {
-			log.info("Evicting restaurant with id " + key + ": " + value.restaurant);
+		public void onEviction(Integer restaurantId, RestaurantCacheEntry cacheEntry) {
+			log.info("Evicting restaurant with id " + restaurantId + ": " + cacheEntry.restaurant);
+			expireAreaCacheForRestaurant(restaurantId);
 		}
 	};
 	
@@ -59,7 +60,7 @@ public class RestaurantJsonCache {
 		this.jsonParser = jsonParser;
 		loadCache();
 	}
-	
+
 	public List<Restaurant> storeResultsInCache(List<String> restaurantJson, float latitude, float longitude) throws IOException {
 		List<Restaurant> restaurants = new ArrayList<Restaurant>();
 		
@@ -73,10 +74,14 @@ public class RestaurantJsonCache {
 			try {
 				Restaurant restaurant = jsonParser.parseRestaurantSearchResultsFromJson(jsonData);
 				restaurants.add(restaurant);
-				RestaurantCacheEntry restaurantCacheEntry = new RestaurantCacheEntry(restaurant, jsonData);
-				cachedRestaurants.put(restaurant.id, restaurantCacheEntry);
-
-				log.info("Storing restaurant: " + restaurant.name);
+				
+				if (cachedRestaurants.get(restaurant.id) == null) {
+					RestaurantCacheEntry restaurantCacheEntry = new RestaurantCacheEntry(restaurant, jsonData);
+					cachedRestaurants.put(restaurant.id, restaurantCacheEntry);
+					log.info("Storing restaurant: " + restaurant.name);
+				}else{
+					log.info("Already stored restaurant: " + restaurant.name);
+				}
 				
 				//TODO can we just assume the last restaurant is the most distant?
 				maxRestaurantDistance = maxDistance(searchLocation, restaurant, maxRestaurantDistance);
@@ -87,6 +92,7 @@ public class RestaurantJsonCache {
 			}
 		}
 		storeArea(restaurants, searchLocation, maxRestaurantDistance);
+		
 		writeCache();
 		return restaurants;
 	}
@@ -102,24 +108,41 @@ public class RestaurantJsonCache {
 
 	private void storeArea(List<Restaurant> restaurants, LatLng searchLocation, double maxRestaurantDistance) {
 		RestaurantArea cachedArea = cachedAreas.get(searchLocation);
-		
-		Set<Integer> restaurantIds;
 		if (cachedArea != null) {
-			//Let's keep the stored list of restaurant ids for this location
-			restaurantIds = cachedArea.restaurantIds;
+			//Only add new restaurant ids if the area radius has increased
+			if (maxRestaurantDistance > cachedArea.radius) {
+				//Add the new restaurant ids to this area
+				for (Restaurant restaurant : restaurants) {
+					cachedArea.restaurantIds.add(restaurant.id);
+				}
+				cachedArea.radius = maxRestaurantDistance;
+				log.info("Expanded area: " + searchLocation + ", radius: " + cachedArea.radius + ", ids: " + cachedArea.restaurantIds);
+			}
 		}else{
-			restaurantIds = new HashSet<Integer>();
+			Set<Integer> restaurantIds = new HashSet<Integer>();
+			for (Restaurant restaurant : restaurants) {
+				restaurantIds.add(restaurant.id);
+			}
+			cachedArea = new RestaurantArea(searchLocation, maxRestaurantDistance, restaurantIds);
+			cachedAreas.put(searchLocation, cachedArea);
+			log.info("Storing new area: " + searchLocation + ", radius: " + cachedArea.radius + ", ids: " + cachedArea.restaurantIds);
 		}
-		
-		//Add the restaurant ids of the new restaurants to store
-		for (Restaurant restaurant : restaurants) {
-			restaurantIds.add(restaurant.id);
+	}
+	
+	private void expireAreaCacheForRestaurant(Integer restaurantId) {
+		List<LatLng> areasToExpire = new ArrayList<LatLng>();
+		for (Entry<LatLng, RestaurantArea> area : cachedAreas.entrySet()) {
+			if (area.getValue().restaurantIds.contains(restaurantId)) {
+				areasToExpire.add(area.getKey());
+			}
 		}
-		cachedArea = new RestaurantArea(searchLocation, maxRestaurantDistance, restaurantIds);
-
-		log.info("Storing area location: " + searchLocation + ", radius: " + maxRestaurantDistance + ", ids: " + restaurantIds);
-		
-		cachedAreas.put(searchLocation, cachedArea);
+		//TODO change the area data structure to store restaurants by distance
+		//Then only remove the given restaurant and those more distant than it
+		//from the search location
+		for (LatLng areaKey : areasToExpire) {
+			RestaurantArea removedArea = cachedAreas.remove(areaKey);
+			log.info("Removed area " + areaKey + " with " + removedArea.restaurantIds.size() + " cached restaurants");
+		}
 	}
 
 	private void loadCache() throws IOException {
@@ -129,7 +152,6 @@ public class RestaurantJsonCache {
 
 	private void loadRestaurantCache() throws IOException {
 		//Set up the cache data structure
-		//TODO add an EvictionListener
 		cachedRestaurants = new ConcurrentLinkedHashMap.Builder<Integer, RestaurantCacheEntry>()
 			    .maximumWeightedCapacity(MAX_CACHE_SIZE)
 			    .listener(cacheEvictionListener)
@@ -175,6 +197,7 @@ public class RestaurantJsonCache {
 	}
 	
 	private void writeRestaurantCache() throws IOException {
+		log.info("Writing cache to disk current size is " + cachedRestaurants.size());
 		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(restaurantCacheFile)));
 		try {
 			for (RestaurantCacheEntry restaurantCacheEntry : cachedRestaurants.values()) {
@@ -200,6 +223,7 @@ public class RestaurantJsonCache {
 		Iterator<Restaurant> restaurantList = getCachedRestaurantsIteractor();
 		List<Restaurant> restaurantsAtLocation = restaurantDistanceService.filterRestaurantsAtLocation(restaurantList, latitude, longitude, maxDistance, maxResults);
 		
+		log.info("Found " + restaurantsAtLocation.size() + " restaurants for location (" + latitude + ", " + longitude + ")");
 		if (!restaurantsAtLocation.isEmpty()) {
 			double searchRadius = restaurantDistanceService.getFurthestRestaurantDistance(latitude, longitude, restaurantsAtLocation);
 			return new RestaurantResults(restaurantsAtLocation, isLocationCached(latitude, longitude, searchRadius));
