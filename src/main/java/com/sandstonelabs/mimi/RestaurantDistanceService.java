@@ -18,6 +18,9 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 
 public class RestaurantDistanceService {
 	
+	//This should really be passed in by the client but we're hardcoding it here for simplicity
+	private static final int RESULTS_PER_PAGE = 20;
+	
 	Logger log = LoggerFactory.getLogger(RestaurantDistanceService.class);
 
 	public double getFurthestRestaurantDistance(float latitude, float longitude, List<Restaurant> restaurantsAtLocation) {
@@ -35,7 +38,7 @@ public class RestaurantDistanceService {
 		return searchRadius;
 	}
 	
-	public List<Restaurant> filterRestaurantsAtLocation(Iterator<Restaurant> restaurantList, float latitude, float longitude, int maxDistance, int maxResults) {
+	public List<Restaurant> filterRestaurantsAtLocation(Iterator<Restaurant> restaurantList, float latitude, float longitude, int page) {
 		//Get all the results from the cache and filter by location
 		final LatLng searchLocation = new LatLng(latitude, longitude);
 		
@@ -45,9 +48,7 @@ public class RestaurantDistanceService {
 		while (restaurantList.hasNext() && (restaurant = restaurantList.next()) != null) {
 			LatLng restaurantLocation = new LatLng(restaurant.latitude, restaurant.longitude);
 			double distance = LatLngTool.distance(searchLocation, restaurantLocation, LengthUnit.METER);
-			if (distance <= maxDistance) {
-				restaurantDistanceMap.put(restaurant, (int)distance);
-			}
+			restaurantDistanceMap.put(restaurant, (int)distance);
 		}
 		
 		if (restaurantDistanceMap.isEmpty()) {
@@ -57,14 +58,14 @@ public class RestaurantDistanceService {
 		List<Entry<Restaurant, Integer>> restaurantEntryList = new ArrayList<Entry<Restaurant, Integer>>(restaurantDistanceMap.entrySet());
 		Collections.sort(restaurantEntryList, restaurantDistanceComparator);
 		
-		int count = 0;
+		//The list is now sorted by distance, make sure we return just the 20 needed for the given page
+		int startIndex = Math.min((page - 1) * RESULTS_PER_PAGE, restaurantEntryList.size());
+		int endIndex = Math.min(page * RESULTS_PER_PAGE, restaurantEntryList.size());
+		
 		List<Restaurant> sortedRestaurants = new ArrayList<Restaurant>();
-		for (Entry<Restaurant, Integer> restaurantEntry : restaurantEntryList) {
-			if (count >= maxResults) {
-				break;
-			}
+		for (int i = startIndex; i < endIndex; i++) {
+			Entry<Restaurant, Integer> restaurantEntry = restaurantEntryList.get(i);
 			sortedRestaurants.add(restaurantEntry.getKey());
-			count++;
 		}
 		
 		return sortedRestaurants;

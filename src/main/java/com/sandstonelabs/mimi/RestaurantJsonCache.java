@@ -219,9 +219,9 @@ public class RestaurantJsonCache {
 		}
 	}
 	
-	public RestaurantResults getRestaurantsAtLocation(float latitude, float longitude, int maxDistance, int maxResults) throws IOException {
+	public RestaurantResults getRestaurantsAtLocation(float latitude, float longitude, int page) throws IOException {
 		Iterator<Restaurant> restaurantList = getCachedRestaurantsIteractor();
-		List<Restaurant> restaurantsAtLocation = restaurantDistanceService.filterRestaurantsAtLocation(restaurantList, latitude, longitude, maxDistance, maxResults);
+		List<Restaurant> restaurantsAtLocation = restaurantDistanceService.filterRestaurantsAtLocation(restaurantList, latitude, longitude, page);
 		
 		log.info("Found " + restaurantsAtLocation.size() + " restaurants for location (" + latitude + ", " + longitude + ")");
 		if (!restaurantsAtLocation.isEmpty()) {

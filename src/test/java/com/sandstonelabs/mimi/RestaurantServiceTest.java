@@ -26,17 +26,16 @@ public class RestaurantServiceTest {
 		
 		float lat = 51.4915f;
 		float lon = -0.1650f;
-		int maxDistance = 300;
-		int maxResults = 20;
+		int page = 1;
 
-		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, page);
 		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		assertTrue(restaurants.isEmpty());
 	}
 	
 	@Test
-	public void testCachedRestaurantsAtLocation_returnsWithinRangeListFromCacheFile() throws IOException {
+	public void testCachedRestaurantsAtLocation_returnsFirstPageFromCacheFile() throws IOException {
 		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
 		
 		File cacheFile = newCacheFileWithExampleData();
@@ -46,41 +45,17 @@ public class RestaurantServiceTest {
 		
 		float lat = 51.4915f;
 		float lon = -0.1650f;
-		int maxDistance = 300;
-		int maxResults = 20;
+		int page = 1;
 		
-		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, page);
 		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		for (Restaurant restaurant : restaurants) {
 			System.out.println(restaurant);
 		}
-		assertEquals(7, restaurants.size());
+		assertEquals(20, restaurants.size());
 	}
 	
-	@Test
-	public void testCachedRestaurantsAtLocation_returnsWithinLimitListFromCacheFile() throws IOException {
-		RestaurantJsonParser jsonParser = new RestaurantJsonParser();
-		
-		File cacheFile = newCacheFileWithExampleData();
-		
-		RestaurantJsonCache restaurantJsonCache = new RestaurantJsonCache(cacheFile, jsonParser);
-		RestaurantService restaurantService = new RestaurantService(null, restaurantJsonCache);
-		
-		float lat = 51.4915f;
-		float lon = -0.1650f;
-		int maxDistance = 300;
-		int maxResults = 5;
-		
-		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, maxDistance, maxResults);
-		List<Restaurant> restaurants = restaurantResults.restaurants;
-		
-		for (Restaurant restaurant : restaurants) {
-			System.out.println(restaurant);
-		}
-		assertEquals(5, restaurants.size());
-	}
-
 	private File clearCacheDirectory() {
 		new File(RestaurantJsonCache.RESTAURANT_CACHE_FILE).delete();
 		new File(RestaurantJsonCache.AREA_CACHE_FILE).delete();

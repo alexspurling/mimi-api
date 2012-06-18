@@ -17,8 +17,8 @@ public class RestaurantService {
 		this.restaurantJsonCache = restaurantJsonCache;
 	}
 	
-	public RestaurantResults getCachedRestaurantsAtLocation(float latitude, float longitude, int maxDistance, int maxResults) throws IOException {
-		return restaurantJsonCache.getRestaurantsAtLocation(latitude, longitude, maxDistance, maxResults);
+	public RestaurantResults getCachedRestaurantsAtLocation(float latitude, float longitude, int page) throws IOException {
+		return restaurantJsonCache.getRestaurantsAtLocation(latitude, longitude, page);
 	}
 	
 	public List<Restaurant> getApiRestaurantsAtLocation(float latitude, float longitude, int page) throws IOException {
