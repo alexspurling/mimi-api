@@ -30,7 +30,9 @@ public class CachedRestaurantSearchTest {
 		
 		RestaurantJsonCache restaurantJsonCache2 = new RestaurantJsonCache(cacheDirectory, jsonParser);
 		
-		RestaurantResults restaurantResults = restaurantJsonCache2.getRestaurantsAtLocation(searchLatitude, searchLongitude, 1);
+		int startIndex = 0;
+		int numResults = 10;
+		RestaurantResults restaurantResults = restaurantJsonCache2.getRestaurantsAtLocation(searchLatitude, searchLongitude, startIndex, numResults);
 		List<Restaurant> allCachedRestaurants = restaurantResults.restaurants;
 		
 		Restaurant restaurant1 = jsonParser.parseRestaurantSearchResultsFromJson(restaurantString1);

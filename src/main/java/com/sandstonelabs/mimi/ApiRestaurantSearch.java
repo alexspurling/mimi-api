@@ -13,16 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiRestaurantSearch {
+	
+	private static final int RESULTS_PER_PAGE = 20;
 
 	public static final String BASE_URL = "http://www2.viamichelin.co.uk";
 	public static final String SEARCH_URL = BASE_URL + "/vmw2/maf/dyn/controller/jseMultiPoiPaginationFinder";
 	public static final String SINGLE_POI_URL = BASE_URL + "/vmw2/maf/dyn/controller/jseSinglePoiFinder";
 
-	public List<String> searchRestaurants(float latitude, float longitude, int page) throws IOException {
+	public List<String> searchRestaurants(float latitude, float longitude, int startIndex) throws IOException {
 
 		URL searchURL = new URL(SEARCH_URL);
 		HttpURLConnection connection = (HttpURLConnection) searchURL.openConnection();
 
+		int page = startIndex / RESULTS_PER_PAGE + 1;
 		String searchParameters = getSearchParameters(latitude, longitude, page);
 
 		connection.setRequestProperty("Content-Length", String.valueOf(searchParameters.getBytes().length));

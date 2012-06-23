@@ -26,9 +26,10 @@ public class RestaurantServiceTest {
 		
 		float lat = 51.4915f;
 		float lon = -0.1650f;
-		int page = 1;
+		int startIndex = 0;
+		int numResults = 10;
 
-		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, page);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, startIndex, numResults);
 		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		assertTrue(restaurants.isEmpty());
@@ -45,9 +46,10 @@ public class RestaurantServiceTest {
 		
 		float lat = 51.4915f;
 		float lon = -0.1650f;
-		int page = 1;
+		int startIndex = 0;
+		int numResults = 20;
 		
-		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, page);
+		RestaurantResults restaurantResults = restaurantService.getCachedRestaurantsAtLocation(lat, lon, startIndex, numResults);
 		List<Restaurant> restaurants = restaurantResults.restaurants;
 		
 		for (Restaurant restaurant : restaurants) {
