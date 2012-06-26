@@ -31,7 +31,7 @@ public class RestaurantJsonCache {
 	
 	private static final Logger log = LoggerFactory.getLogger(RestaurantJsonCache.class);
 
-	private static final int MAX_CACHE_SIZE = 100;
+	private static final int MAX_CACHE_SIZE = 500;
 
 	public static final String RESTAURANT_CACHE_FILE = "restaurant_cache.txt";
 	public static final String AREA_CACHE_FILE = "restaurant_area_cache.txt";
